@@ -7,9 +7,9 @@
     </head>
     <body>
 
-        <div class="parallax-root" style="background-image:url(images/bg.jpg); height: 407px">
+        <div class="parallax-root" style="height: 407px; visibility: hidden">
             <div class="parallax-scene scene" style="width: 2680px;">
-                <div class="layer" data-depth="0.2" style="width: 2680px;"><img src="images/bg.jpg"></div>
+                <div class="layer" data-depth="0.2" data-limit-y="30" style="width: 2680px; margin-top: -30px; "><img src="images/bg.jpg"></div>
                 <div class="layer" data-depth="0.4" style="width: 2680px;"><img src="images/fruit-clearness.png"></div>
                 <div class="layer" data-depth="1.0" style="width: 2680px;"><img src="images/fruit-blur.png"></div>
             </div>
@@ -32,7 +32,10 @@
                 function onResize(){
                     $root.scrollLeft(($scene.width() - $root.width()) / 2 );
                 }
+
+                $root.css("visibility","visible")
                 onResize();
+
                 S.all(window).on("resize", onResize);
                 new Parallax(".parallax-scene", {
                     frictionY : 0.05,

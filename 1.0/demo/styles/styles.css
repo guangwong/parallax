@@ -17,8 +17,20 @@ html, body {
     background-repeat: no-repeat;
 }
 
-.parallax-root .layer{
-    display: none;
+
+.parallax-root .layer img{
+    -webkit-animation-duration: 15s;
+    -webkit-animation-timing-function: ease-out;
+    -webkit-animation-iteration-count: infinite;
+    -webkit-animation-fill-mode: forwards;
+    -webkit-animation-direction: alternate;
+}
+
+.parallax-root .layer:nth-child(2) img{
+    -webkit-animation-name: line1;
+}
+.parallax-root .layer:nth-child(3) img{
+    -webkit-animation-name: line2;
 }
 
 .parallax-root .scene{
@@ -26,3 +38,45 @@ html, body {
     position: absolute;
 }
 
+
+@-webkit-keyframes line1 {
+    0% {
+        -webkit-transform:translate(-10px , -5px);
+    }
+    20%{
+        -webkit-transform:translate(-15px , -15px);
+    }
+    40%{
+        -webkit-transform:translate(-25px , -25px);
+    }
+    50%{
+        -webkit-transform:translate(-30px , -30px);
+    }
+    80%{
+        -webkit-transform:translate(-15px , -15px);
+    }
+    10%{
+        -webkit-transform:translate(-25px , -25px);
+    }
+}
+
+@-webkit-keyframes line2 {
+    0% {
+        -webkit-transform:translate(10px , 5px);
+    }
+    20%{
+        -webkit-transform:translate(15px , 15px);
+    }
+    40%{
+        -webkit-transform:translate(25px , 25px);
+    }
+    50%{
+        -webkit-transform:translate(30px , 30px);
+    }
+    80%{
+        -webkit-transform:translate(15px , 15px);
+    }
+    10%{
+        -webkit-transform:translate(25px , 25px);
+    }
+}

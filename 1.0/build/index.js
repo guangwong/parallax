@@ -147,7 +147,7 @@ KISSY.add('gallery/parallax/1.0/index',['node', 'dom', 'event', './helpers'], fu
         // States
         this.calibrationTimer = null;
         this.enabled = false;
-        this.depths = [];
+        this.layersCache = [];
         this.raf = null;
 
         // Element Bounds
@@ -219,7 +219,7 @@ KISSY.add('gallery/parallax/1.0/index',['node', 'dom', 'event', './helpers'], fu
 
         // Cache Layer Elements
         this.$layers = this.$context.all('.layer');
-        this.depths = [];
+        this.layersCache = [];
 
         // Configure Layer Styles
         this.$layers.css({
@@ -237,8 +237,15 @@ KISSY.add('gallery/parallax/1.0/index',['node', 'dom', 'event', './helpers'], fu
 
         // Cache Depths
         this.$layers.each(S.bind(function (element, index) {
-            var depth = parseFloat(S.all(element).attr('data-depth'), 10);
-            this.depths.push(depth || 0);
+            var $ele = S.all(element);
+            var depth = parseFloat($ele.attr('data-depth'), 10);
+            var limitY = parseFloat($ele.attr('data-limit-y'), 10);
+            var limitX = parseFloat($ele.attr('data-limit-x'), 10);
+            this.layersCache.push({
+                depth  : depth||0,
+                limitY : limitY||null,
+                limitX : limitX||null
+            });
         }, this));
     };
 
@@ -310,15 +317,37 @@ KISSY.add('gallery/parallax/1.0/index',['node', 'dom', 'event', './helpers'], fu
         this.mx = this.ix * this.ew * (this.scalarX / 100) * -1;
         this.my = this.iy * this.eh * (this.scalarY / 100) * -1;
 
-        this.vx += (this.mx - this.vx) * this.frictionX;
-        this.vy += (this.my - this.vy) * this.frictionY;
+        var vxInc = (this.mx - this.vx) * this.frictionX;
+        var vyInc = (this.my - this.vy) * this.frictionY;
+        this.vx += vxInc;
+        this.vy += vyInc;
 
-        for (var i = 0, l = this.$layers.length; i < l; i++) {
-            var depth = this.depths[i];
-            var layer = this.$layers[i];
-            var xOffset = this.vx * depth;
-            var yOffset = this.vy * depth;
-            this.setPosition(layer, xOffset, yOffset);
+
+        if(Math.abs(vxInc) > 0.01 &&  Math.abs(vyInc) > 0.01){
+
+            for (var i = 0, l = this.$layers.length; i < l; i++) {
+                var depth = this.layersCache[i].depth;
+                var limitX = this.layersCache[i].limitX;
+                var limitY = this.layersCache[i].limitY;
+                var layer = this.$layers[i];
+                var xOffset = this.vx * depth;
+                var yOffset = this.vy * depth;
+
+                if(limitX && xOffset > 0){
+                    xOffset = Math.min(limitX, xOffset);
+                }
+                if(limitX && xOffset < 0){
+                    xOffset = Math.max(-limitX, xOffset);
+                }
+                if(limitY && yOffset > 0){
+                    yOffset = Math.min(limitY, yOffset);
+                }
+                if(limitY && yOffset < 0){
+                    yOffset = Math.max(-limitY, yOffset);
+                }
+
+                this.setPosition(layer, xOffset, yOffset);
+            }
         }
 
         this.raf = requestAnimationFrame(this.onAnimationFrame);
@@ -343,3 +372,4 @@ KISSY.add('gallery/parallax/1.0/index',['node', 'dom', 'event', './helpers'], fu
     return Plugin;
 
 });
+
