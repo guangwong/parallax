@@ -1,0 +1,31 @@
+body {
+    font-family: monospace;
+    font-size: 18px;
+    margin: 0;
+}
+
+img {
+    display: block;
+}
+
+
+.container {
+    height: 550px;
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+}
+
+.scene{
+    height: 100%;
+    width: 1391px;
+    position: absolute;
+    left:-50%;
+}
+
+.scene-wraper{
+    margin-top: -25px;
+    position: relative;
+    width: 1391px;
+    height: 100%;
+}

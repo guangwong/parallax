@@ -1,0 +1,17 @@
+{
+    "name": "parallax",
+    "comName":"Parallax",
+    "version": "1.0",
+    "desc": "",
+    "tag":"",
+    "githubName":"guangwong",
+    "author": {
+        "name": "九十",
+        "email": "wongguang.wg@alibaba-inc.com",
+        "page": ""
+    },
+	"flexComboPort":"8081",
+	"reserveServerPort":"8080",
+    "type": "kissy-gallery",
+    "type-url": "http://gallery.kissyui.com/guide"
+}

@@ -1,0 +1,45 @@
+<!DOCTPYE html>
+<html>
+    <head>
+        <title>First demo for parallax</title>
+        <link rel="stylesheet" type="text/css" href="styles/styles.css"/>
+        <script src="http://g.tbcdn.cn/kissy/k/1.4.3/seed.js" ></script>
+    </head>
+    <body>
+
+        <div id="container" class="container">
+            <div class="scene-wraper">
+                <div id="scene" class="scene">
+                    <div class="layer" data-depth="0.3"><img src="images/eat_layer1.jpg"></div>
+                    <div class="layer" data-depth="0.3"><img src="images/eat_layer2.png"></div>
+                    <div class="layer" data-depth="0.5"><img src="images/eat_layer3.png"></div>
+                    <div class="layer" data-depth="1"><img src="images/eat_layer4.png"></div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+
+
+            KISSY.config({
+                packages : {
+                    "parallax" : {
+                        base    : "../",
+                        debug   : true,
+                        ignorePackageNameInUri:true
+                    }
+                }
+            });
+
+            KISSY.use("parallax/index", function(S, Parallax){
+                new Parallax("#scene", {
+                    frictionY : 0.05,
+                    frictionX : 0.05
+                });
+            });
+
+        </script>
+
+    </body>
+</html>
+
