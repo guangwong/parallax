@@ -1,31 +1,28 @@
-body {
-    font-family: monospace;
-    font-size: 18px;
+html, body {
     margin: 0;
+    padding: 0;
 }
 
-img {
+.parallax-root img {
     display: block;
+    margin: 0 auto;
 }
 
 
-.container {
-    height: 550px;
+.parallax-root {
     width: 100%;
     overflow: hidden;
     position: relative;
+    background-position: center;
+    background-repeat: no-repeat;
 }
 
-.scene{
+.parallax-root .layer{
+    display: none;
+}
+
+.parallax-root .scene{
     height: 100%;
-    width: 1391px;
     position: absolute;
-    left:-50%;
 }
 
-.scene-wraper{
-    margin-top: -25px;
-    position: relative;
-    width: 1391px;
-    height: 100%;
-}

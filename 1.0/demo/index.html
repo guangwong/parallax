@@ -7,20 +7,15 @@
     </head>
     <body>
 
-        <div id="container" class="container">
-            <div class="scene-wraper">
-                <div id="scene" class="scene">
-                    <div class="layer" data-depth="0.3"><img src="images/eat_layer1.jpg"></div>
-                    <div class="layer" data-depth="0.3"><img src="images/eat_layer2.png"></div>
-                    <div class="layer" data-depth="0.5"><img src="images/eat_layer3.png"></div>
-                    <div class="layer" data-depth="1"><img src="images/eat_layer4.png"></div>
-                </div>
+        <div class="parallax-root" style="background-image:url(images/bg.jpg); height: 407px">
+            <div class="parallax-scene scene" style="width: 2680px;">
+                <div class="layer" data-depth="0.2" style="width: 2680px;"><img src="images/bg.jpg"></div>
+                <div class="layer" data-depth="0.4" style="width: 2680px;"><img src="images/fruit-clearness.png"></div>
+                <div class="layer" data-depth="1.0" style="width: 2680px;"><img src="images/fruit-blur.png"></div>
             </div>
         </div>
-
         <script>
-
-
+            //config debug info
             KISSY.config({
                 packages : {
                     "parallax" : {
@@ -30,16 +25,21 @@
                     }
                 }
             });
+            KISSY.use("node,parallax/index", function(S, Node, Parallax){
+                var $root   = S.all(".parallax-root");
+                var $scene  = $root.all(".scene");
 
-            KISSY.use("parallax/index", function(S, Parallax){
-                new Parallax("#scene", {
+                function onResize(){
+                    $root.scrollLeft(($scene.width() - $root.width()) / 2 );
+                }
+                onResize();
+                S.all(window).on("resize", onResize);
+                new Parallax(".parallax-scene", {
                     frictionY : 0.05,
                     frictionX : 0.05
                 });
             });
-
         </script>
-
     </body>
 </html>
 
