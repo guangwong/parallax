@@ -3,6 +3,11 @@ html, body {
     padding: 0;
 }
 
+
+h1{
+    height: 3000px;
+}
+
 .parallax-root img {
     display: block;
     margin: 0 auto;

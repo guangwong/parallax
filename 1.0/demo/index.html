@@ -7,14 +7,23 @@
     </head>
     <body>
 
-        <div class="parallax-root" style="height: 407px; visibility: hidden">
-            <div class="parallax-scene scene" style="width: 2680px;">
-                <div class="layer" data-depth="0.2" data-limit-y="30" style="width: 2680px; margin-top: -30px; "><img src="images/bg.jpg"></div>
-                <div class="layer" data-depth="0.4" style="width: 2680px;"><img src="images/fruit-clearness.png"></div>
-                <div class="layer" data-depth="1.0" style="width: 2680px;"><img src="images/fruit-blur.png"></div>
+    <h2>TEST</h2>
+
+        <div class="parallax-banner" style="height: 407px;" >
+
+            <div class="parallax-srcroot" >
+                <div class="parallax-root" style="height: 407px; visibility: hidden">
+                    <div class="parallax-scene scene" style="width: 2680px;">
+                        <div class="layer" data-depth="0.2" data-limit-y="30" style="width: 2680px; margin-top: -30px; "><img src="images/bg.jpg"></div>
+                        <div class="layer" data-depth="0.4" style="width: 2680px;"><img src="images/fruit-clearness.png"></div>
+                        <div class="layer" data-depth="1.0" style="width: 2680px;"><img src="images/fruit-blur.png"></div>
+                    </div>
+                </div>
             </div>
+
         </div>
         <script>
+
             //config debug info
             KISSY.config({
                 packages : {
@@ -28,12 +37,14 @@
             KISSY.use("node,parallax/index", function(S, Node, Parallax){
                 var $root   = S.all(".parallax-root");
                 var $scene  = $root.all(".scene");
+                var $win    = S.all(window);
 
                 function onResize(){
                     $root.scrollLeft(($scene.width() - $root.width()) / 2 );
                 }
 
-                $root.css("visibility","visible")
+
+                $root.css("visibility","visible");
                 onResize();
 
                 S.all(window).on("resize", onResize);
@@ -41,8 +52,51 @@
                     frictionY : 0.05,
                     frictionX : 0.05
                 });
+
+
+                if(window.requestAnimationFrame){
+
+                    var $scrRoot    = S.all(".parallax-srcroot");
+                    var rootsOffset = $scrRoot.offset();
+                    var rootsHeight = $scrRoot.height();
+
+                    $scrRoot.css("position", "relative").css("overflow", "hidden");
+
+                    function onScroll(){
+                        var winScrTop   = $win.scrollTop();
+                        var differ      = winScrTop-rootsOffset.top;
+                        var height      = Math.max(0,rootsHeight-differ);
+                        var marginBottom= Math.min(differ,rootsHeight);
+                        if(differ > 0){
+                            $scrRoot.css({
+                                "position": "fixed",
+                                "width":"100%",
+                                "top":"0",
+                                "height":height
+                            });
+                        }else{
+                            $scrRoot.css({
+                                "position": "relative",
+                                "width":"auto",
+                                "top":"auto",
+                                "height":"auto"
+                            });
+
+                        }
+                        requestAnimationFrame(onScroll);
+                    }
+                    requestAnimationFrame(onScroll);
+                    S.all(window).on("scroll", onScroll);
+                }
+
+
+
+
+
+
             });
         </script>
+    <h1>TEST</h1>
     </body>
 </html>
 
