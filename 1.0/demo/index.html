@@ -1,4 +1,4 @@
-<!DOCTPYE html>
+<!DOCTYPE html>
 <html>
     <head>
         <title>First demo for parallax</title>
@@ -34,7 +34,9 @@
                     }
                 }
             });
-            KISSY.use("node,parallax/index", function(S, Node, Parallax){
+
+            KISSY.use("node, parallax/index, ua", function(S, Node, Parallax, UA){
+
                 var $root   = S.all(".parallax-root");
                 var $scene  = $root.all(".scene");
                 var $win    = S.all(window);
@@ -42,19 +44,18 @@
                 function onResize(){
                     $root.scrollLeft(($scene.width() - $root.width()) / 2 );
                 }
-
+                onResize();
+                S.all(window).on("resize", onResize);
 
                 $root.css("visibility","visible");
-                onResize();
-
-                S.all(window).on("resize", onResize);
-                new Parallax(".parallax-scene", {
-                    frictionY : 0.05,
-                    frictionX : 0.05
-                });
 
 
-                if(window.requestAnimationFrame){
+                if(UA.ie > 8 || !UA.ie){
+
+                    new Parallax(".parallax-scene", {
+                        frictionY : 0.05,
+                        frictionX : 0.05
+                    });
 
                     var $scrRoot    = S.all(".parallax-srcroot");
                     var rootsOffset = $scrRoot.offset();
@@ -81,18 +82,12 @@
                                 "top":"auto",
                                 "height":"auto"
                             });
-
                         }
-                        requestAnimationFrame(onScroll);
                     }
-                    requestAnimationFrame(onScroll);
+                    onScroll();
                     S.all(window).on("scroll", onScroll);
+
                 }
-
-
-
-
-
 
             });
         </script>

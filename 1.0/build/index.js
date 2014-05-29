@@ -57,16 +57,36 @@ KISSY.add('gallery/parallax/1.0/helpers',['dom'], function (S,require,exports,mo
     };
     module.exports.transformSupport = transformSupport;
 
+    function camelCase(value) {
+        return value.replace(/-+(.)?/g, function(match, character){
+            return character ? character.toUpperCase() : '';
+        });
+    };
 
 
+    function css(element, property, value){
+        var jsProperty;
+        for (var i = 0, l = vendors.length; i < l; i++) {
+            if (vendors[i] !== null) {
+                jsProperty = camelCase(vendors[i][1] + '-' + property);
+            } else {
+                jsProperty = property;
+            }
+            if (element.style[jsProperty] !== undefined) {
+                break;
+            }
+        }
+        element.style[jsProperty] = value;
+    }
 
     function accelerate3D ($element){
 
         for (var i = 0, l = $element.length; i < l; i++) {
             var element = $element[i];
-            DOM.css(element, 'transform', 'translate3d(0,0,0)');
-            DOM.css(element, 'transform-style', 'preserve-3d');
-            DOM.css(element, 'backface-visibility', 'hidden');
+
+            css(element, 'transform', 'translate3d(0,0,0)');
+            css(element, 'transform-style', 'preserve-3d');
+            css(element, 'backface-visibility', 'hidden');
         }
     }
     module.exports.accelerate3D = accelerate3D;
@@ -109,13 +129,14 @@ KISSY.add('gallery/parallax/1.0/helpers',['dom'], function (S,require,exports,mo
 
 });
 
-KISSY.add('gallery/parallax/1.0/index',['node', 'dom', 'event', './helpers'], function(S,require,exports,module){
+KISSY.add('gallery/parallax/1.0/index',['node', 'dom', 'event', 'json', './helpers'], function(S,require,exports,module){
 
     'use strict';
 
     var Node    = require("node");
     var DOM     = require("dom");
     var Event   = require("event");
+    var JSON    = require("json");
     var Helpers = require("./helpers");
 
     var DEFAULTS = {
@@ -141,6 +162,7 @@ KISSY.add('gallery/parallax/1.0/index',['node', 'dom', 'event', './helpers'], fu
         this.$context = $element;
         this.$layers = this.$context.all('.layer');
 
+        this.$window  = S.all(window);
         // Compose Settings Object
         S.mix(this, S.mix(S.clone(DEFAULTS), options));
 
@@ -180,8 +202,9 @@ KISSY.add('gallery/parallax/1.0/index',['node', 'dom', 'event', './helpers'], fu
 
         // Callbacks
         this.onMouseMove = S.bind(this.onMouseMove, this);
-        this.onWindowResize = S.bind(this.onWindowResize,this);
-        this.onAnimationFrame = S.bind(this.onAnimationFrame,this);
+        this.onWindowResize = S.bind(this.onWindowResize, this);
+        this.doUpdateBounds = S.throttle(this.updateBounds, 500, this);
+        this.onAnimationFrame = S.bind(this.onAnimationFrame, this);
 
         // Initialise
         this.initialise();
@@ -211,8 +234,8 @@ KISSY.add('gallery/parallax/1.0/index',['node', 'dom', 'event', './helpers'], fu
         // Setup
         this.updateLayers();
         this.updateDimensions();
+        this.updateBounds();
         this.enable();
-        this.queueCalibration(this.calibrationDelay);
     };
 
     Plugin.prototype.updateLayers = function () {
@@ -250,8 +273,9 @@ KISSY.add('gallery/parallax/1.0/index',['node', 'dom', 'event', './helpers'], fu
     };
 
     Plugin.prototype.updateDimensions = function () {
-        this.ww = window.innerWidth;
-        this.wh = window.innerHeight;
+        this.ww = this.$window.width();
+        this.wh = this.$window.height();
+
         this.wcx = this.ww * this.originX;
         this.wcy = this.wh * this.originY;
         this.wrx = Math.max(this.wcx, this.ww - this.wcx);
@@ -259,7 +283,19 @@ KISSY.add('gallery/parallax/1.0/index',['node', 'dom', 'event', './helpers'], fu
     };
 
     Plugin.prototype.updateBounds = function () {
-        this.bounds = this.element.getBoundingClientRect();
+
+        var $context= this.$context;
+        var offset  = $context.offset();
+
+        this.bounds = {
+            left    : offset.left,
+            top     : offset.top,
+            width   : $context.width(),
+            height  : $context.height()
+        };
+
+        //alert(JSON.stringify(this.bounds));
+        //S.all("h1").append("<p>"+JSON.stringify(this.bounds)+"</p>");
         this.ex = this.bounds.left;
         this.ey = this.bounds.top;
         this.ew = this.bounds.width;
@@ -270,16 +306,14 @@ KISSY.add('gallery/parallax/1.0/index',['node', 'dom', 'event', './helpers'], fu
         this.ery = Math.max(this.ecy, this.eh - this.ecy);
     };
 
-    Plugin.prototype.queueCalibration = function (delay) {
-        clearTimeout(this.calibrationTimer);
-        this.calibrationTimer = setTimeout(this.onCalibrationTimer, delay);
-    };
 
     Plugin.prototype.enable = function () {
         if (!this.enabled) {
             this.enabled = true;
-            Event.on(window, "mousemove", this.onMouseMove);
+            Event.on(document, "mousemove", this.onMouseMove);
             Event.on(window, 'resize', this.onWindowResize);
+            Event.on(window, 'resize', this.doUpdateBounds);
+            Event.on(window, "scroll", this.doUpdateBounds);
             this.raf = requestAnimationFrame(this.onAnimationFrame);
         }
     };
@@ -287,8 +321,10 @@ KISSY.add('gallery/parallax/1.0/index',['node', 'dom', 'event', './helpers'], fu
     Plugin.prototype.disable = function () {
         if (this.enabled) {
             this.enabled = false;
-            window.removeEventListener('mousemove', this.onMouseMove);
-            window.removeEventListener('resize', this.onWindowResize);
+            Event.detach('mousemove', this.onMouseMove);
+            Event.detach('resize', this.onWindowResize);
+            Event.detach(window, 'resize', this.doUpdateBounds);
+            Event.detach(window, "scroll", this.doUpdateBounds);
             cancelAnimationFrame(this.raf);
         }
     };
@@ -312,7 +348,7 @@ KISSY.add('gallery/parallax/1.0/index',['node', 'dom', 'event', './helpers'], fu
 
     Plugin.prototype.onAnimationFrame = function () {
 
-        this.updateBounds();
+        //this.updateBounds();
 
         this.mx = this.ix * this.ew * (this.scalarX / 100) * -1;
         this.my = this.iy * this.eh * (this.scalarY / 100) * -1;
@@ -322,32 +358,28 @@ KISSY.add('gallery/parallax/1.0/index',['node', 'dom', 'event', './helpers'], fu
         this.vx += vxInc;
         this.vy += vyInc;
 
+        for (var i = 0, l = this.$layers.length; i < l; i++) {
+            var depth = this.layersCache[i].depth;
+            var limitX = this.layersCache[i].limitX;
+            var limitY = this.layersCache[i].limitY;
+            var layer = this.$layers[i];
+            var xOffset = this.vx * depth;
+            var yOffset = this.vy * depth;
 
-        if(Math.abs(vxInc) > 0.01 &&  Math.abs(vyInc) > 0.01){
-
-            for (var i = 0, l = this.$layers.length; i < l; i++) {
-                var depth = this.layersCache[i].depth;
-                var limitX = this.layersCache[i].limitX;
-                var limitY = this.layersCache[i].limitY;
-                var layer = this.$layers[i];
-                var xOffset = this.vx * depth;
-                var yOffset = this.vy * depth;
-
-                if(limitX && xOffset > 0){
-                    xOffset = Math.min(limitX, xOffset);
-                }
-                if(limitX && xOffset < 0){
-                    xOffset = Math.max(-limitX, xOffset);
-                }
-                if(limitY && yOffset > 0){
-                    yOffset = Math.min(limitY, yOffset);
-                }
-                if(limitY && yOffset < 0){
-                    yOffset = Math.max(-limitY, yOffset);
-                }
-
-                this.setPosition(layer, xOffset, yOffset);
+            if(limitX && xOffset > 0){
+                xOffset = Math.min(limitX, xOffset);
             }
+            if(limitX && xOffset < 0){
+                xOffset = Math.max(-limitX, xOffset);
+            }
+            if(limitY && yOffset > 0){
+                yOffset = Math.min(limitY, yOffset);
+            }
+            if(limitY && yOffset < 0){
+                yOffset = Math.max(-limitY, yOffset);
+            }
+
+            this.setPosition(layer, xOffset, yOffset);
         }
 
         this.raf = requestAnimationFrame(this.onAnimationFrame);

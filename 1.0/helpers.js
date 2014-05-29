@@ -50,16 +50,36 @@ KISSY.add(function (S,require,exports,module) {
     };
     module.exports.transformSupport = transformSupport;
 
+    function camelCase(value) {
+        return value.replace(/-+(.)?/g, function(match, character){
+            return character ? character.toUpperCase() : '';
+        });
+    };
 
 
+    function css(element, property, value){
+        var jsProperty;
+        for (var i = 0, l = vendors.length; i < l; i++) {
+            if (vendors[i] !== null) {
+                jsProperty = camelCase(vendors[i][1] + '-' + property);
+            } else {
+                jsProperty = property;
+            }
+            if (element.style[jsProperty] !== undefined) {
+                break;
+            }
+        }
+        element.style[jsProperty] = value;
+    }
 
     function accelerate3D ($element){
 
         for (var i = 0, l = $element.length; i < l; i++) {
             var element = $element[i];
-            DOM.css(element, 'transform', 'translate3d(0,0,0)');
-            DOM.css(element, 'transform-style', 'preserve-3d');
-            DOM.css(element, 'backface-visibility', 'hidden');
+
+            css(element, 'transform', 'translate3d(0,0,0)');
+            css(element, 'transform-style', 'preserve-3d');
+            css(element, 'backface-visibility', 'hidden');
         }
     }
     module.exports.accelerate3D = accelerate3D;
