@@ -1,6 +1,6 @@
-KISSY.add(function (S,require,exports,module) {
-    var DOM     = require("dom");
+KISSY.add(function (S,DOM) {
 
+    var EXPORTS = {};
     var vendors = [null, ['-webkit-', 'webkit'], ['-moz-', 'Moz'], ['-o-', 'O'], ['-ms-', 'ms']];
     function transformSupport(value) {
         var element = document.createElement('div');
@@ -48,7 +48,7 @@ KISSY.add(function (S,require,exports,module) {
         }
         return featureSupport;
     };
-    module.exports.transformSupport = transformSupport;
+    EXPORTS.transformSupport = transformSupport;
 
     function camelCase(value) {
         return value.replace(/-+(.)?/g, function(match, character){
@@ -72,6 +72,8 @@ KISSY.add(function (S,require,exports,module) {
         element.style[jsProperty] = value;
     }
 
+    EXPORTS.css = css;
+
     function accelerate3D ($element){
 
         for (var i = 0, l = $element.length; i < l; i++) {
@@ -82,7 +84,7 @@ KISSY.add(function (S,require,exports,module) {
             css(element, 'backface-visibility', 'hidden');
         }
     }
-    module.exports.accelerate3D = accelerate3D;
+    EXPORTS.accelerate3D = accelerate3D;
 
 
 
@@ -116,8 +118,11 @@ KISSY.add(function (S,require,exports,module) {
 
     }());
 
-    module.exports.requestAnimationFrame = requestAnimationFrame;
-    module.exports.cancelAnimationFrame  = cancelAnimationFrame;
+    EXPORTS.requestAnimationFrame = requestAnimationFrame;
+    EXPORTS.cancelAnimationFrame  = cancelAnimationFrame;
 
+    return EXPORTS;
 
+}, {
+    requires : ["dom"]
 });

@@ -7,7 +7,8 @@
     </head>
     <body>
 
-    <h2>TEST</h2>
+        <h2>Demo1</h2>
+        <h2>Demo1</h2>
 
         <div class="parallax-banner" style="height: 407px;" >
 
@@ -35,7 +36,8 @@
                 }
             });
 
-            KISSY.use("node, parallax/index, ua", function(S, Node, Parallax, UA){
+            KISSY.use("node,parallax/index, ua", function(S, Node, Parallax, UA){
+
 
                 var $root   = S.all(".parallax-root");
                 var $scene  = $root.all(".scene");
@@ -49,45 +51,48 @@
 
                 $root.css("visibility","visible");
 
+                ///////////////////////
 
-                if(UA.ie > 8 || !UA.ie){
+                new Parallax(".parallax-scene", {
+                    frictionY : 0.05,
+                    frictionX : 0.05
+                });
 
-                    new Parallax(".parallax-scene", {
-                        frictionY : 0.05,
-                        frictionX : 0.05
-                    });
+                ///////////////////////
 
-                    var $scrRoot    = S.all(".parallax-srcroot");
-                    var rootsOffset = $scrRoot.offset();
-                    var rootsHeight = $scrRoot.height();
+                /// 以下为一个视差滚动的实现，暂未抽象插件
 
-                    $scrRoot.css("position", "relative").css("overflow", "hidden");
+                var $scrRoot    = S.all(".parallax-srcroot");
+                var rootsOffset = $scrRoot.offset();
+                var rootsHeight = $scrRoot.height();
 
-                    function onScroll(){
-                        var winScrTop   = $win.scrollTop();
-                        var differ      = winScrTop-rootsOffset.top;
-                        var height      = Math.max(0,rootsHeight-differ);
-                        var marginBottom= Math.min(differ,rootsHeight);
-                        if(differ > 0){
-                            $scrRoot.css({
-                                "position": "fixed",
-                                "width":"100%",
-                                "top":"0",
-                                "height":height
-                            });
-                        }else{
-                            $scrRoot.css({
-                                "position": "relative",
-                                "width":"auto",
-                                "top":"auto",
-                                "height":"auto"
-                            });
-                        }
+                $scrRoot.css("position", "relative").css("overflow", "hidden");
+
+                function onScroll(){
+                    var winScrTop   = $win.scrollTop();
+                    var differ      = winScrTop-rootsOffset.top;
+                    var height      = Math.max(0,rootsHeight-differ);
+                    var marginBottom= Math.min(differ,rootsHeight);
+                    if(differ > 0){
+                        $scrRoot.css({
+                            "position": "fixed",
+                            "width":"100%",
+                            "top":"0",
+                            "height":height
+                        });
+                    }else{
+                        $scrRoot.css({
+                            "position": "relative",
+                            "width":"auto",
+                            "top":"auto",
+                            "height":"auto"
+                        });
                     }
-                    onScroll();
-                    S.all(window).on("scroll", onScroll);
-
                 }
+                onScroll();
+                S.all(window).on("scroll", onScroll);
+
+
 
             });
         </script>

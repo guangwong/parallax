@@ -5,9 +5,9 @@ gallery/parallax/1.0/helpers
 gallery/parallax/1.0/index
 
 */
-KISSY.add('gallery/parallax/1.0/helpers',['dom'], function (S,require,exports,module) {
-    var DOM     = require("dom");
+KISSY.add('gallery/parallax/1.0/helpers',function (S,DOM) {
 
+    var EXPORTS = {};
     var vendors = [null, ['-webkit-', 'webkit'], ['-moz-', 'Moz'], ['-o-', 'O'], ['-ms-', 'ms']];
     function transformSupport(value) {
         var element = document.createElement('div');
@@ -55,7 +55,7 @@ KISSY.add('gallery/parallax/1.0/helpers',['dom'], function (S,require,exports,mo
         }
         return featureSupport;
     };
-    module.exports.transformSupport = transformSupport;
+    EXPORTS.transformSupport = transformSupport;
 
     function camelCase(value) {
         return value.replace(/-+(.)?/g, function(match, character){
@@ -79,6 +79,8 @@ KISSY.add('gallery/parallax/1.0/helpers',['dom'], function (S,require,exports,mo
         element.style[jsProperty] = value;
     }
 
+    EXPORTS.css = css;
+
     function accelerate3D ($element){
 
         for (var i = 0, l = $element.length; i < l; i++) {
@@ -89,7 +91,7 @@ KISSY.add('gallery/parallax/1.0/helpers',['dom'], function (S,require,exports,mo
             css(element, 'backface-visibility', 'hidden');
         }
     }
-    module.exports.accelerate3D = accelerate3D;
+    EXPORTS.accelerate3D = accelerate3D;
 
 
 
@@ -123,21 +125,19 @@ KISSY.add('gallery/parallax/1.0/helpers',['dom'], function (S,require,exports,mo
 
     }());
 
-    module.exports.requestAnimationFrame = requestAnimationFrame;
-    module.exports.cancelAnimationFrame  = cancelAnimationFrame;
+    EXPORTS.requestAnimationFrame = requestAnimationFrame;
+    EXPORTS.cancelAnimationFrame  = cancelAnimationFrame;
 
+    return EXPORTS;
 
+}, {
+    requires : ["dom"]
 });
 
-KISSY.add('gallery/parallax/1.0/index',['node', 'dom', 'event', 'json', './helpers'], function(S,require,exports,module){
+KISSY.add('gallery/parallax/1.0/index',function(S,Node,DOM,Event,JSON,Helpers){
 
     'use strict';
 
-    var Node    = require("node");
-    var DOM     = require("dom");
-    var Event   = require("event");
-    var JSON    = require("json");
-    var Helpers = require("./helpers");
 
     var DEFAULTS = {
         calibrationDelay: 500,
@@ -333,9 +333,9 @@ KISSY.add('gallery/parallax/1.0/index',['node', 'dom', 'event', 'json', './helpe
         x += 'px';
         y += 'px';
         if (this.transform3DSupport) {
-            DOM.css(element, 'transform', 'translate3d(' + x + ',' + y + ',0)');
+            Helpers.css(element, 'transform', 'translate3d(' + x + ',' + y + ',0)');
         } else if (this.transform2DSupport) {
-            DOM.css(element, 'transform', 'translate(' + x + ',' + y + ')');
+            Helpers.css(element, 'transform', 'translate(' + x + ',' + y + ')');
         } else {
             element.style.left = x;
             element.style.top = y;
@@ -403,5 +403,7 @@ KISSY.add('gallery/parallax/1.0/index',['node', 'dom', 'event', 'json', './helpe
 
     return Plugin;
 
+}, {
+    requires : [ "node","dom","event","json","./helpers" ]
 });
 

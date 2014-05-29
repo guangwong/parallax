@@ -1,12 +1,7 @@
-KISSY.add(function(S,require,exports,module){
+KISSY.add(function(S,Node,DOM,Event,JSON,Helpers){
 
     'use strict';
 
-    var Node    = require("node");
-    var DOM     = require("dom");
-    var Event   = require("event");
-    var JSON    = require("json");
-    var Helpers = require("./helpers");
 
     var DEFAULTS = {
         calibrationDelay: 500,
@@ -202,9 +197,9 @@ KISSY.add(function(S,require,exports,module){
         x += 'px';
         y += 'px';
         if (this.transform3DSupport) {
-            DOM.css(element, 'transform', 'translate3d(' + x + ',' + y + ',0)');
+            Helpers.css(element, 'transform', 'translate3d(' + x + ',' + y + ',0)');
         } else if (this.transform2DSupport) {
-            DOM.css(element, 'transform', 'translate(' + x + ',' + y + ')');
+            Helpers.css(element, 'transform', 'translate(' + x + ',' + y + ')');
         } else {
             element.style.left = x;
             element.style.top = y;
@@ -272,4 +267,6 @@ KISSY.add(function(S,require,exports,module){
 
     return Plugin;
 
+}, {
+    requires : [ "node","dom","event","json","./helpers" ]
 });
